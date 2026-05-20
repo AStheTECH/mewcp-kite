@@ -1,9 +1,21 @@
 import logging
 from typing import Any, Dict, List, Optional
 
+from fastmcp_credentials import get_credentials
 from kiteconnect import KiteConnect
 
 logger = logging.getLogger("kite-mcp-server")
+
+
+def get_kite_client() -> "KiteClient":
+    cred = get_credentials()
+    api_key = cred.fields.get("api_key")
+    access_token = cred.fields.get("access_token")
+    if not api_key:
+        raise ValueError("No 'api_key' found in credentials")
+    if not access_token:
+        raise ValueError("No 'access_token' found in credentials")
+    return KiteClient(api_key=api_key, access_token=access_token)
 
 
 class KiteClient:

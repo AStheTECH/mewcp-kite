@@ -4,7 +4,7 @@ import logging
 from fastmcp import FastMCP
 from pydantic import Field
 
-from .service import KiteClient
+from .service import get_kite_client
 
 logger = logging.getLogger("kite-mcp-server")
 
@@ -17,8 +17,6 @@ def register_tools(mcp: FastMCP) -> None:
         description="Place an order on Zerodha Kite. Supports market, limit, SL, and SL-M orders.",
     )
     async def kite_place_order(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
         tradingsymbol: str = Field(
             ..., description="Trading symbol (e.g., 'INFY', 'RELIANCE')"
         ),
@@ -44,7 +42,7 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> str:
         """Place an order."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             result = client.place_order(
                 tradingsymbol=tradingsymbol,
                 exchange=exchange,
@@ -75,13 +73,10 @@ def register_tools(mcp: FastMCP) -> None:
         name="kite_get_orders",
         description="Get all orders for the user. Returns order details including status, quantity, price.",
     )
-    async def kite_get_orders(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
-    ) -> str:
+    async def kite_get_orders() -> str:
         """Get all orders."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             orders = client.get_orders()
 
             output = {
@@ -112,8 +107,6 @@ def register_tools(mcp: FastMCP) -> None:
         description="Cancel an existing order by order ID.",
     )
     async def kite_cancel_order(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
         order_id: str = Field(..., description="Order ID to cancel"),
         variety: str = Field(
             default="regular", description="Order variety (regular, co, amo, iceberg)"
@@ -121,7 +114,7 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> str:
         """Cancel an order."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             result = client.cancel_order(order_id, variety=variety)
 
             output = {
@@ -140,13 +133,10 @@ def register_tools(mcp: FastMCP) -> None:
         name="kite_get_positions",
         description="Get all positions (day and overnight) for the user.",
     )
-    async def kite_get_positions(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
-    ) -> str:
+    async def kite_get_positions() -> str:
         """Get positions."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             positions = client.get_positions()
 
             output = {
@@ -184,13 +174,10 @@ def register_tools(mcp: FastMCP) -> None:
         name="kite_get_holdings",
         description="Get all holdings (delivery portfolio) for the user.",
     )
-    async def kite_get_holdings(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
-    ) -> str:
+    async def kite_get_holdings() -> str:
         """Get holdings."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             holdings = client.get_holdings()
 
             output = {
@@ -219,8 +206,6 @@ def register_tools(mcp: FastMCP) -> None:
         description="Get real-time market quotes for one or more instruments.",
     )
     async def kite_get_quote(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
         instruments: str = Field(
             ...,
             description="Comma-separated instrument tokens or symbols (e.g., 'NSE:INFY,NSE:RELIANCE')",
@@ -228,7 +213,7 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> str:
         """Get market quotes."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             instrument_list = [i.strip() for i in instruments.split(",")]
             quotes = client.get_quote(instrument_list)
 
@@ -254,13 +239,10 @@ def register_tools(mcp: FastMCP) -> None:
         name="kite_get_profile",
         description="Get user profile information including name, email, phone, and exchange access.",
     )
-    async def kite_get_profile(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
-    ) -> str:
+    async def kite_get_profile() -> str:
         """Get user profile."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             profile = client.get_profile()
 
             output = {
@@ -284,13 +266,10 @@ def register_tools(mcp: FastMCP) -> None:
         name="kite_get_margins",
         description="Get user margins (available, utilized, and total).",
     )
-    async def kite_get_margins(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
-    ) -> str:
+    async def kite_get_margins() -> str:
         """Get margins."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             margins = client.get_margins()
 
             output = {
@@ -309,8 +288,6 @@ def register_tools(mcp: FastMCP) -> None:
         description="Get historical candlestick data for an instrument.",
     )
     async def kite_get_historical_data(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
         instrument_token: str = Field(
             ...,
             description="Instrument token (use kite_get_instruments to find tokens)",
@@ -324,7 +301,7 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> str:
         """Get historical data."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             data = client.get_historical_data(
                 instrument_token=instrument_token,
                 from_date=from_date,
@@ -351,8 +328,6 @@ def register_tools(mcp: FastMCP) -> None:
         description="Get list of all instruments or filter by exchange.",
     )
     async def kite_get_instruments(
-        api_key: str = Field(..., description="Kite Connect API key"),
-        access_token: str = Field(..., description="Access token from Kite login"),
         exchange: str = Field(
             default=None, description="Filter by exchange (NSE, BSE, NFO, MCX, CDS)"
         ),
@@ -365,7 +340,7 @@ def register_tools(mcp: FastMCP) -> None:
     ) -> str:
         """Get instrument list."""
         try:
-            client = KiteClient(api_key, access_token)
+            client = get_kite_client()
             instruments = client.get_instruments(exchange=exchange)
 
             # Limit results
